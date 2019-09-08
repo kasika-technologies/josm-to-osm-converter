@@ -162,13 +162,5 @@ func Convert(reader io.Reader) (*entities.OsmRoot, error) {
 		osmRoot.Relations = append(osmRoot.Relations, relation)
 	}
 
-	//fmt.Println(osmRoot)
-	//
-	//x, err := xml.Marshal(osmRoot)
-	//if err != nil {
-	//	return osmRoot, err
-	//}
-	//fmt.Println(string(x))
-
 	return osmRoot, nil
 }
