@@ -2,6 +2,8 @@ codes.musubu.co.jp/musubu/josm v0.0.0-20190908041317-9c45113b3bf8 h1:ptObzMVnCIQ
 codes.musubu.co.jp/musubu/josm v0.0.0-20190908041317-9c45113b3bf8/go.mod h1:bHQOFHdeKgfsb8Y3qKCgMHgrpkdvxLwFk/hVUTVkAhQ=
 github.com/davecgh/go-spew v1.1.0 h1:ZDRjVQ15GmhC3fiQ8ni8+OwkZQO4DARzQgrnXU1Liz8=
 github.com/davecgh/go-spew v1.1.0/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
+github.com/measure-compute-visualize/quad_tile v0.0.0-20190905002347-7369caa89400 h1:l+WyDjyj3rpvclWLEBQWGUdBSxNCiWmlRY60xSTbmNo=
+github.com/measure-compute-visualize/quad_tile v0.0.0-20190905002347-7369caa89400/go.mod h1:6YFgK5hQjy1PSJCnEPE70la6LYcsmVRp3ljn95tyKS0=
 github.com/pmezard/go-difflib v1.0.0 h1:4DBwDE0NGyQoBHbLQYPwSUPoCMWR5BEzIk/f1lZbAQM=
 github.com/pmezard/go-difflib v1.0.0/go.mod h1:iKH77koFhYxTK1pcRnkKkqfTogsbg7gZNVY4sRDYZ/4=
 github.com/stretchr/objx v0.1.0/go.mod h1:HFkY916IF+rwdDfMAkV7OtwuqBVzrE8GR6GFx+wExME=

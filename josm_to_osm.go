@@ -4,7 +4,9 @@ import (
 	"codes.musubu.co.jp/musubu/josm"
 	"codes.musubu.co.jp/musubu/josm-to-osm-converter/entities"
 	"fmt"
+	"github.com/measure-compute-visualize/quad_tile"
 	"io"
+	"strings"
 	"time"
 )
 
@@ -170,6 +172,8 @@ func ConvertToSql(root *entities.OsmRoot) (string, error) {
 	var query string
 	var err error
 
+	var queries []string
+
 	now := time.Now().UTC().Format(time.RFC3339)
 
 	for _, node := range root.Nodes {
@@ -181,21 +185,80 @@ func ConvertToSql(root *entities.OsmRoot) (string, error) {
 		lat := int64(node.Latitude * 10000000)
 		lon := int64(node.Longitude * 10000000)
 		visible := "true"
-		tile := 1
+		tile := quad_tile.TileForPoint(node.Longitude, node.Latitude)
 
 		qUser := fmt.Sprintf("insert into users (id, email, pass_crypt, creation_time, display_name, description) values (%d, '%s', '%s', '%s', '%s', '%s') on conflict on constraint users_pkey do update set display_name='%s';", node.Uid, email, passCrypt, now, node.User, "", node.User)
-		fmt.Println(qUser)
+		queries = append(queries, qUser)
 
 		qChangeset := fmt.Sprintf("insert into changesets (id, user_id, created_at, closed_at) values (%d, %d, '%s', '%s') on conflict on constraint changesets_pkey do update set user_id=%d;", changesetId, node.Uid, now, now, node.Uid)
-		fmt.Println(qChangeset)
+		queries = append(queries, qChangeset)
 
 		qNode := fmt.Sprintf("insert into current_nodes (id, latitude, longitude, changeset_id, visible, timestamp, tile, version) values (%d, %d, %d, %d, %s, '%s', %d, %d);", node.Id, lat, lon, node.Changeset, visible, node.Timestamp.Format(time.RFC3339), tile, node.Version)
-		fmt.Println(qNode)
+		queries = append(queries, qNode)
+
+		for _, tag := range node.Tags {
+			qNodeTag := fmt.Sprintf("insert into current_node_tags (node_id, k, v) values (%d, '%s', '%s');", tag.NodeId, tag.Key, tag.Value)
+			queries = append(queries, qNodeTag)
+		}
+	}
+
+	for _, way := range root.Ways {
+		email := fmt.Sprintf("%d@example.com", way.Uid)
+		passCrypt := "sample"
+
+		changesetId := 1
+
+		qUser := fmt.Sprintf("insert into users (id, email, pass_crypt, creation_time, display_name, description) values (%d, '%s', '%s', '%s', '%s', '%s') on conflict on constraint users_pkey do update set display_name='%s';", way.Uid, email, passCrypt, now, way.User, "", way.User)
+		queries = append(queries, qUser)
+
+		qChangeset := fmt.Sprintf("insert into changesets (id, user_id, created_at, closed_at) values (%d, %d, '%s', '%s') on conflict on constraint changesets_pkey do update set user_id=%d;", changesetId, way.Uid, now, now, way.Uid)
+		queries = append(queries, qChangeset)
+
+		qWay := fmt.Sprintf("insert into current_ways (id, changeset_id, timestamp, visible, version) values (%d, %d, '%s', true, %d);", way.Id, changesetId, way.Timestamp.Format(time.RFC3339), way.Version)
+		queries = append(queries, qWay)
+
+		for _, tag := range way.Tags {
+			qWayTag := fmt.Sprintf("insert into current_way_tags (way_id, k, v) values (%d, '%s', '%s');", tag.WayId, tag.Key, tag.Value)
+			queries = append(queries, qWayTag)
+		}
+
+		for i, node := range way.Nodes {
+			qWayNode := fmt.Sprintf("insert into current_way_nodes (way_id, node_id, sequence_id) values (%d, %d, %d);", node.WayId, node.NodeId, int64(i+1))
+			queries = append(queries, qWayNode)
+		}
+	}
+
+	for _, relation := range root.Relations {
+		email := fmt.Sprintf("%d@example.com", relation.Uid)
+		passCrypt := "sample"
+
+		changesetId := 1
+
+		qUser := fmt.Sprintf("insert into users (id, email, pass_crypt, creation_time, display_name, description) values (%d, '%s', '%s', '%s', '%s', '%s') on conflict on constraint users_pkey do update set display_name='%s';", relation.Uid, email, passCrypt, now, relation.User, "", relation.User)
+		queries = append(queries, qUser)
+
+		qChangeset := fmt.Sprintf("insert into changesets (id, user_id, created_at, closed_at) values (%d, %d, '%s', '%s') on conflict on constraint changesets_pkey do update set user_id=%d;", changesetId, relation.Uid, now, now, relation.Uid)
+		queries = append(queries, qChangeset)
+
+		qRelation := fmt.Sprintf("insert into current_relations (id, changeset_id, timestamp, visible, version) values (%d, %d, '%s', true, %d);", relation.Id, changesetId, relation.Timestamp.Format(time.RFC3339), relation.Version)
+		queries = append(queries, qRelation)
+
+		for _, tag := range relation.Tags {
+			qRelationTag := fmt.Sprintf("insert into current_relation_tags (relation_id, k, v) values (%d, '%s', '%s');", tag.RelationId, tag.Key, tag.Value)
+			queries = append(queries, qRelationTag)
+		}
+
+		for i, member := range relation.Members {
+			qMember := fmt.Sprintf("insert into current_relation_members (relation_id, member_type, member_id, member_role, sequence_id) values (%d, '%s', %d, '%s', %d);", member.RelationId, strings.Title(member.MemberType), member.MemberId, member.MemberRole, int64(i+1))
+			queries = append(queries, qMember)
+		}
 	}
 
 	if err != nil {
 		return query, err
 	}
+
+	query = strings.Join(queries, "\n")
 
 	return query, nil
 }
