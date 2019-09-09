@@ -3,6 +3,7 @@ package josm_to_osm_converter
 import (
 	"codes.musubu.co.jp/musubu/josm"
 	"codes.musubu.co.jp/musubu/josm-to-osm-converter/entities"
+	"fmt"
 	"io"
 	"time"
 )
@@ -163,4 +164,38 @@ func Convert(reader io.Reader) (*entities.OsmRoot, error) {
 	}
 
 	return osmRoot, nil
+}
+
+func ConvertToSql(root *entities.OsmRoot) (string, error) {
+	var query string
+	var err error
+
+	now := time.Now().UTC().Format(time.RFC3339)
+
+	for _, node := range root.Nodes {
+		email := fmt.Sprintf("%d@example.com", node.Uid)
+		passCrypt := "sample"
+
+		changesetId := 1
+
+		lat := int64(node.Latitude * 10000000)
+		lon := int64(node.Longitude * 10000000)
+		visible := "true"
+		tile := 1
+
+		qUser := fmt.Sprintf("insert into users (id, email, pass_crypt, creation_time, display_name, description) values (%d, '%s', '%s', '%s', '%s', '%s') on conflict on constraint users_pkey do update set display_name='%s';", node.Uid, email, passCrypt, now, node.User, "", node.User)
+		fmt.Println(qUser)
+
+		qChangeset := fmt.Sprintf("insert into changesets (id, user_id, created_at, closed_at) values (%d, %d, '%s', '%s') on conflict on constraint changesets_pkey do update set user_id=%d;", changesetId, node.Uid, now, now, node.Uid)
+		fmt.Println(qChangeset)
+
+		qNode := fmt.Sprintf("insert into current_nodes (id, latitude, longitude, changeset_id, visible, timestamp, tile, version) values (%d, %d, %d, %d, %s, '%s', %d, %d);", node.Id, lat, lon, node.Changeset, visible, node.Timestamp.Format(time.RFC3339), tile, node.Version)
+		fmt.Println(qNode)
+	}
+
+	if err != nil {
+		return query, err
+	}
+
+	return query, nil
 }

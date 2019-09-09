@@ -17,6 +17,17 @@ func TestConvert(t *testing.T) {
 	})
 }
 
+func TestConvertToSql(t *testing.T) {
+	t.Run("convert bytes to sql", func(t *testing.T) {
+		osmRoot, err := Convert(bytes.NewReader(testData))
+
+		assert.NoError(t, err, "Got error.")
+		query, err := ConvertToSql(osmRoot)
+		assert.NoError(t, err, "Got error.")
+		assert.NotEmpty(t, query, "empty.")
+	})
+}
+
 var testData = []byte(`<?xml version='1.0' encoding='UTF-8'?>
 <osm version='0.6' generator='JOSM'>
   <bounds minlat='35.60348' minlon='139.7278' maxlat='35.61147' maxlon='139.74207' origin='OpenStreetMap server' />
