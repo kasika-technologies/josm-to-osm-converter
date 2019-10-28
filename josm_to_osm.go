@@ -4,7 +4,7 @@ import (
 	"codes.musubu.co.jp/musubu/josm"
 	"codes.musubu.co.jp/musubu/josm-to-osm-converter/entities"
 	"fmt"
-	"github.com/measure-compute-visualize/quad_tile"
+	quadTile "github.com/kasika-technologies/quad_tile"
 	"io"
 	"strings"
 	"time"
@@ -185,7 +185,7 @@ func ConvertToSql(root *entities.OsmRoot) (string, error) {
 		lat := int64(node.Latitude * 10000000)
 		lon := int64(node.Longitude * 10000000)
 		visible := "true"
-		tile := quad_tile.TileForPoint(node.Longitude, node.Latitude)
+		tile := quadTile.TileForPoint(node.Longitude, node.Latitude)
 
 		qUser := fmt.Sprintf("insert into users (id, email, pass_crypt, creation_time, display_name, description) values (%d, '%s', '%s', '%s', '%s', '%s') on conflict on constraint users_pkey do update set display_name='%s';", node.Uid, email, passCrypt, now, node.User, "", node.User)
 		queries = append(queries, qUser)
