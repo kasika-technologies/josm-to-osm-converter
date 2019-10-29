@@ -10,10 +10,11 @@ func TestConvert(t *testing.T) {
 	t.Run("convert bytes", func(t *testing.T) {
 		osmRoot, err := Convert(bytes.NewReader(testData))
 
-		assert.NoError(t, err, "got error.")
-		assert.Equal(t, 26, len(osmRoot.Nodes), "Root has 26 nodes.")
-		assert.Equal(t, 7, len(osmRoot.Ways), "Root has 7 ways.")
-		assert.Equal(t, 5, len(osmRoot.Relations), "Root has 5 relations.")
+		if assert.NoError(t, err) {
+			assert.Equal(t, 26, len(osmRoot.Nodes), "Root has 26 nodes.")
+			assert.Equal(t, 7, len(osmRoot.Ways), "Root has 7 ways.")
+			assert.Equal(t, 5, len(osmRoot.Relations), "Root has 5 relations.")
+		}
 	})
 }
 
@@ -21,10 +22,12 @@ func TestConvertToSql(t *testing.T) {
 	t.Run("convert bytes to sql", func(t *testing.T) {
 		osmRoot, err := Convert(bytes.NewReader(testData))
 
-		assert.NoError(t, err, "Got error.")
-		query, err := ConvertToSql(osmRoot)
-		assert.NoError(t, err, "Got error.")
-		assert.NotEmpty(t, query, "empty.")
+		if assert.NoError(t, err) {
+			query, err := ConvertToSql(osmRoot)
+			if assert.NoError(t, err) {
+				assert.NotEmpty(t, query, "empty.")
+			}
+		}
 	})
 }
 
