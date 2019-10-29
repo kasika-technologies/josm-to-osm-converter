@@ -1,6 +1,6 @@
 package main
 
-import "codes.musubu.co.jp/musubu/josm-to-osm-converter/cmd/cli/cmd"
+import "github.com/kasika-technologies/josm-to-osm-converter/cmd/cli/cmd"
 
 func main() {
 	cmd.Execute()
