@@ -1,4 +1,4 @@
-package josm_to_osm_converter
+package josm2osm
 
 import (
 	"codes.musubu.co.jp/musubu/josm"
