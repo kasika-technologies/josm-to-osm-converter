@@ -1,9 +1,9 @@
 package josm2osm
 
 import (
-	"codes.musubu.co.jp/musubu/josm"
-	"codes.musubu.co.jp/musubu/josm-to-osm-converter/entities"
 	"fmt"
+	"github.com/kasika-technologies/josm"
+	"github.com/kasika-technologies/josm-to-osm-converter/entities"
 	quadTile "github.com/kasika-technologies/quad_tile"
 	"io"
 	"strings"

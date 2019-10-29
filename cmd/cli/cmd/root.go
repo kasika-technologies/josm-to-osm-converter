@@ -2,9 +2,9 @@ package cmd
 
 import (
 	"bytes"
-	"codes.musubu.co.jp/musubu/josm-to-osm-converter/josm2osm"
 	"encoding/xml"
 	"fmt"
+	"github.com/kasika-technologies/josm-to-osm-converter/josm2osm"
 	"github.com/spf13/cobra"
 	"io/ioutil"
 	"os"
